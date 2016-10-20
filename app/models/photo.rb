@@ -45,26 +45,35 @@ class Photo
     end
 
     def save
-    	if !persisted?
+    	if persisted?
+    			id = BSON::ObjectId.from_string(self.id)
+    			#puts "#{id}"
+    			#puts "#{self.location.to_hash}"
+    			od = self.class.mongo_client.database.fs.find({:_id => id}).update_one('$set' => {"metadata.location" => self.location.to_hash})
+    	else
     		if @contents
     			gps=EXIFR::JPEG.new(@contents).gps
     		    @location = Point.new(:lng=>gps.longitude, :lat=>gps.latitude)
     		    @contents.rewind
     		    description = {}
-    			description[:content_type] = "image/jpeg"
-    			description[:metadata] = {}
-    			description[:metadata][:location] = @location.to_hash
-    			grid_file = Mongo::Grid::File.new(@contents.read, description)
-    			id=self.class.mongo_client.database.fs.insert_one(grid_file)
-    			@id=id.to_s
-    		end
-    	else
-    		@id.to_s
-    	end
+    		    description[:content_type] = "image/jpeg"
+    		    description[:metadata] = {}
+    		    description[:metadata][:location] = @location.to_hash
+    		    grid_file = Mongo::Grid::File.new(@contents.read, description)
+    		    id=self.class.mongo_client.database.fs.insert_one(grid_file)
+    		    @id=id.to_s    
+    		end		
+    	end    	
     end
 
     def destroy
     	self.class.mongo_client.database.fs.find(:_id => BSON::ObjectId.from_string(@id)).delete_one
+    end
+
+    def find_nearest_place_id(max_dist)
+    	pl = Place.to_places(Place.near(@location, max_dist).limit(1)).first
+    	
+    	return pl.nil? ? nil : BSON::ObjectId.from_string(pl.id)
     end
 
 end

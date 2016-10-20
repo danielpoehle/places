@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Module 2, Summative Assignment: Advanced MongoDB Ruby Driver Topics
 
 This assignment will evaluate your ability to implement a data tier
@@ -1766,3 +1767,6 @@ and will perform a test with different query terms.
 ```
 
 #### Last Updated: 2016-05-22
+=======
+# places
+>>>>>>> 9d965e52470e1d570d786f38864bc30e6ca0ef89

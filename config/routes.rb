@@ -1,4 +1,13 @@
 Rails.application.routes.draw do
+  
+  
+
+  get 'photos/:id/show', to: 'photos#show', as: 'photos_show'
+
+  resources :places, only: [:index, :show]
+
+  root 'places#index'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

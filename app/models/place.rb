@@ -36,7 +36,7 @@ class Place
 	end
 
 	def self.find id
-		id = BSON::ObjectId.from_string(id)
+		id = BSON::ObjectId.from_string(id) if !id.nil? and id != ""
 		result = self.collection.find(:_id => id).first
 		return result.nil? ? nil : Place.new(result)
 	end
@@ -94,6 +94,14 @@ class Place
 
 	def near(max_m = 4611686018427387904)
 		Place.to_places(Place.near(@location, max_m))
+	end
+
+	def photos(offset=0, limit=nil)
+		result = Photo.find_photos_for_place(@id).skip(offset)
+		result = result.limit(limit) if !limit.nil?
+		result.map do |view|
+			Photo.new(view)
+		end
 	end
 
 end

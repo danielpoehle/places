@@ -66,10 +66,11 @@ class Photo
     def save
     	if persisted?
     			id = BSON::ObjectId.from_string(self.id)
+    			place_id = self.place.nil? ? nil : BSON::ObjectId.from_string(self.place.id)
     			#puts "#{id}"
     			#puts "#{self.location.to_hash}"
     			od = self.class.mongo_client.database.fs.find({:_id => id}).update_one('$set' => {"metadata.location" => self.location.to_hash,
-    																							  "metadata.place" => BSON::ObjectId.from_string(self.place.id)})
+    																							  "metadata.place" => place_id})
     	else
     		if @contents
     			gps=EXIFR::JPEG.new(@contents).gps
